@@ -1,17 +1,34 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div id="app" class="col-12">
+    <input type="text" class="col-12" v-model="search" placeholder="Date or Author or Title Search"/>
+    <ul class="col-12">
+      <li class="col-12" v-for="recording in filteredRecordings">
+        <a :href="recording.htmlPath">{{recording.date}} - {{recording.author}} - {{recording.title}}</a>
+      </li>
+    </ul>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
 export default {
   name: 'app',
-  components: {
-    HelloWorld
+  data () {
+    return {
+      recordings: [],
+      search: ''
+    }
+  },
+  created () {
+    this.$http.get('/recordings.json').then(function (data) {
+      this.recordings = data.body.reverse()
+    })
+  },
+  computed: {
+    filteredRecordings: function () {
+      return this.recordings.filter((recording) => {
+        return recording.title.match(this.search) || recording.author.match(this.search) || recording.date.match(this.search)
+      })
+    }
   }
 }
 </script>
@@ -23,6 +40,16 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  margin-top: 20px;
+}
+ul {
+  margin-top: 20px;
+}
+ul > li {
+  list-style: none;
+  text-align: left;
+}
+input {
+  width: 20em;
 }
 </style>
